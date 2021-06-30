@@ -22,8 +22,10 @@ class ForgotPasswordBloc extends Cubit<ForgotPasswordUIState> {
       try {
         emit(ApiHandling(ApiResponse.loading()));
         var response = await ApiManager.sendForgotPasswordRequest(_email);
+        emit(ApiHandling(ApiResponse.hideLoading()));
         emit(ApiHandling(ApiResponse.completed(response)));
       } catch (e) {
+        emit(ApiHandling(ApiResponse.hideLoading()));
         emit(ApiHandling(ApiResponse.error(message: e.toString())));
       }
     }

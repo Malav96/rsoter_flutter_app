@@ -41,6 +41,7 @@ showSuccessMessageAlertDialog(
       actions: <Widget>[
         TextButton(
             onPressed: () {
+              Navigator.pop(context);
               onButtonClicked();
             },
             child: Text(button_ok, style: TextStyle(color: COLOR_PRIMARY))),
@@ -84,13 +85,16 @@ Widget addMenuTextItem(
     required String menuItemText,
     required Function onTap}) {
   var textTheme = Theme.of(context).textTheme;
-  return Padding(
-      padding: EdgeInsets.only(right: 16.0),
-      child: GestureDetector(
-        onTap: () => {onTap()},
+  return Center(
+    child: GestureDetector(
+      onTap: () => {onTap()},
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Center(
             child: Text(menuItemText,
                 style: textTheme.subtitle1?.merge(TextStyle(
                     fontWeight: FontWeight.bold, color: COLOR_WHITE)))),
-      ));
+      ),
+    ),
+  );
 }

@@ -15,6 +15,8 @@ const button_delete = 'DELETE';
 /*All error*/
 const error_email = 'Please enter a valid email address';
 const error_password = 'Please enter a password';
+const error_first_name = 'Please enter your first name';
+const error_last_name = 'Please enter your last name';
 const error_bad_request =
     'There was a problem while connecting to our server, please try again.';
 const error_inter_server = 'Internal server error';

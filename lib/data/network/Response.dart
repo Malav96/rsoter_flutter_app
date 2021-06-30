@@ -8,6 +8,8 @@ class ApiResponse<T> {
 
   ApiResponse.loading() : status = Status.LOADING;
 
+  ApiResponse.hideLoading() : status = Status.HIDE_LOADING;
+
   ApiResponse.completed(this.data) : status = Status.COMPLETED;
 
   ApiResponse.error({this.title = '', this.message = ''})
@@ -27,4 +29,4 @@ class ApiResponse<T> {
   }
 }
 
-enum Status { LOADING, COMPLETED, ERROR, EMPTY, OFFLINE }
+enum Status { LOADING, COMPLETED, ERROR, EMPTY, OFFLINE, HIDE_LOADING }

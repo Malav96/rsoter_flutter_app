@@ -37,8 +37,10 @@ class LoginBloc extends Cubit<LoginUIStates> {
         Prefs.setToken(response.sid);
         Prefs.setUserEmail(_email);
         Prefs.setUserPassword(_password);
+        emit(ApiHandling(ApiResponse.hideLoading()));
         emit(ApiHandling(ApiResponse.completed(response)));
       } catch (e) {
+        emit(ApiHandling(ApiResponse.hideLoading()));
         emit(ApiHandling(ApiResponse.error(message: e.toString())));
       }
     }

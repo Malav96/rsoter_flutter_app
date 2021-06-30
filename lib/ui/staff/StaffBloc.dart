@@ -69,4 +69,10 @@ class StaffBloc extends Cubit<StaffUIStates> {
     }
     emit(ApiHandling(ApiResponse.completed(_filterStaffList)));
   }
+
+  Future<void> redirectToAddOrEditStaffScreen(
+      Staff? staff, bool isAddStaff) async {
+    emit(ShowAddOrEditStaff(staff, isAddStaff));
+    emit(ApiHandling(ApiResponse.completed(_staffList)));
+  }
 }
