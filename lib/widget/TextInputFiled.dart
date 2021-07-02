@@ -9,6 +9,7 @@ class TextInputField extends StatelessWidget {
   final bool obscureText;
   final Color textInputBackgroundColor;
   final String? initialValue;
+  final VoidCallback? onClicked;
 
   const TextInputField(
       {Key? key,
@@ -18,7 +19,8 @@ class TextInputField extends StatelessWidget {
       required this.inputAction,
       this.obscureText = false,
       this.textInputBackgroundColor = COLOR_WHITE,
-      this.initialValue})
+      this.initialValue,
+      this.onClicked})
       : super(key: key);
 
   @override
@@ -30,6 +32,9 @@ class TextInputField extends StatelessWidget {
           color: textInputBackgroundColor,
           border: Border.all(color: COLOR_GREY, width: 0.5)),
       child: TextFormField(
+          onTap: () {
+            onClicked!();
+          },
           onChanged: onChanged,
           initialValue: initialValue,
           cursorColor: COLOR_PRIMARY,

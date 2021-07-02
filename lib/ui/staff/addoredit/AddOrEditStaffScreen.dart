@@ -1,3 +1,5 @@
+import 'package:country_code_picker/country_code_picker.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_demo_app/data/network/Response.dart';
@@ -7,12 +9,15 @@ import 'package:flutter_demo_app/ui/staff/addoredit/AddOrEditStaffUIStates.dart'
 import 'package:flutter_demo_app/utils/UtilsLibrary.dart';
 import 'package:flutter_demo_app/widget/WidgetLibrary.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:phone_number/phone_number.dart';
 
 class AddOrEditStaffScreen extends StatelessWidget {
   final bool isAddStaff;
   final Staff? staff;
   late BuildContext _buildContext;
   late AddOrEditStaffBloc _addOrEditStaffBloc;
+  static final GlobalKey<ScaffoldState> _scaffoldKey =
+      GlobalKey<ScaffoldState>();
 
   AddOrEditStaffScreen({required this.isAddStaff, required this.staff});
 
@@ -32,6 +37,7 @@ class AddOrEditStaffScreen extends StatelessWidget {
     return BlocBuilder<AddOrEditStaffBloc, AddOrEditStaffUIStates>(
         builder: (context, state) {
       return Scaffold(
+        key: _scaffoldKey,
         backgroundColor: COLOR_VIEW_BACKGROUND,
         appBar: AppBar(
           centerTitle: true,
@@ -54,7 +60,6 @@ class AddOrEditStaffScreen extends StatelessWidget {
     return BlocListener<AddOrEditStaffBloc, AddOrEditStaffUIStates>(
       listener: (context, state) {
         FocusScope.of(context).unfocus();
-        hideSnackBar(buildContext: context);
         if (state is ShowValidationError) {
           Fluttertoast.showToast(msg: state.errorMessage);
         } else {
@@ -64,12 +69,8 @@ class AddOrEditStaffScreen extends StatelessWidget {
             } else if (state.response.status == Status.HIDE_LOADING) {
               Navigator.of(context).pop();
             } else if (state.response.status == Status.ERROR) {
-              showSnackBar(
-                  buildContext: context,
-                  message: state.response.message,
-                  onButtonClicked: () => {
-                    _addOrEditStaffBloc.validateCredentials()
-                      });
+              _scaffoldKey.currentState?.showSnackBar(displaySnackBar(
+                  message: state.response.message, snackBarAction: null));
             } else if (state.response.status == Status.COMPLETED) {
               Navigator.pop(context, true);
             }
@@ -81,7 +82,8 @@ class AddOrEditStaffScreen extends StatelessWidget {
   }
 
   Widget _addOrEditStaffBody() {
-    return Padding(
+    return SingleChildScrollView(
+        child: Padding(
       padding: const EdgeInsets.only(left: 16, right: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -93,12 +95,23 @@ class AddOrEditStaffScreen extends StatelessWidget {
           SizedBox(height: 12),
           _emailTextInput(),
           SizedBox(height: 12),
-          _mobileNumberTextInput(),
+          Container(
+            width: SizeConfig.screenWidth * 0.8,
+            decoration: BoxDecoration(
+                color: COLOR_WHITE,
+                border: Border.all(color: COLOR_GREY, width: 0.5)),
+            child: Row(
+              children: [
+                Flexible(child: _countryCodePicker()),
+                Flexible(child: _mobileNumberTextField()),
+              ],
+            ),
+          ),
           if (!isAddStaff) SizedBox(height: 32),
           if (!isAddStaff) _deleteButton(),
         ],
       ),
-    );
+    ));
   }
 
   Widget _appbarTitle() {
@@ -141,21 +154,86 @@ class AddOrEditStaffScreen extends StatelessWidget {
         inputAction: TextInputAction.next);
   }
 
-  Widget _mobileNumberTextInput() {
-    return TextInputField(
-        initialValue: staff?.yourNumber,
-        hintText: hint_mobile_number,
+  Widget _countryCodePicker() {
+    return FutureBuilder<String>(
+      future: _addOrEditStaffBloc.formatCountryCode(),
+      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return _displayCountryFlag(snapshot.data);
+        } else {
+          if (snapshot.hasError)
+            return _displayCountryFlag(snapshot.data);
+          else
+            return _displayCountryFlag(snapshot.data);
+        }
+      },
+    );
+  }
+
+  Widget _displayCountryFlag(String? dialCode) {
+    return CountryCodePicker(
+      dialogSize:
+          Size(SizeConfig.screenWidth * 0.8, SizeConfig.screenHeight * 0.8),
+      onChanged: (value) {
+        _addOrEditStaffBloc.onCountryCodeChange(value);
+      },
+      onInit: (value) {
+        _addOrEditStaffBloc.onCountryCodeChange(value);
+      },
+      initialSelection: dialCode,
+      showCountryOnly: true,
+      hideMainText: true,
+      padding: EdgeInsets.only(left: 8.0, top: 8.0, bottom: 8.0),
+      searchDecoration: InputDecoration(hintText: 'Search by country name'),
+    );
+  }
+
+  Widget _mobileNumberTextField() {
+    return FutureBuilder<String>(
+        future: _addOrEditStaffBloc.getFormattedNumber(),
+        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Container();
+          } else if (snapshot.connectionState == ConnectionState.done) {
+            return _mobileNumberTextInput(snapshot.data);
+          } else {
+            return _mobileNumberTextInput(hint_mobile_number);
+          }
+        });
+  }
+
+  Widget _mobileNumberTextInput(String? formattedNumber) {
+    return TextFormField(
+        initialValue: formattedNumber,
+        decoration: InputDecoration(
+          hintText: hint_mobile_number,
+          border: InputBorder.none,
+        ),
         onChanged: (value) {
           _addOrEditStaffBloc.onMobileNumberChange(value);
         },
-        inputType: TextInputType.phone,
-        inputAction: TextInputAction.done);
+        keyboardType: TextInputType.phone,
+        textInputAction: TextInputAction.done);
   }
 
   Widget _deleteButton() {
     return NormalButton(
       buttonText: button_delete,
-      onClicked: () {},
+      onClicked: () {
+        showDialog(
+            context: _buildContext,
+            builder: (BuildContext context) {
+              return CustomDialogBox(
+                title: label_delete_staff,
+                actionButtonText: button_delete,
+                cancelButtonText: button_cancel,
+                descriptions: msg_delete_employee,
+                onPressed: () {
+                  _addOrEditStaffBloc.deleteStaff(staff?.id ?? 0);
+                },
+              );
+            });
+      },
       buttonColor: COLOR_GREY,
     );
   }

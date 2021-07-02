@@ -50,25 +50,13 @@ showSuccessMessageAlertDialog(
   );
 }
 
-showSnackBar(
-    {required BuildContext buildContext,
-    required String message,
-    required Function onButtonClicked}) {
-  final snackBar = SnackBar(
+SnackBar displaySnackBar(
+    {required String message, required SnackBarAction? snackBarAction}) {
+  return SnackBar(
     duration: Duration(minutes: 5),
     content: Text(message),
-    action: SnackBarAction(
-      label: button_try_again,
-      onPressed: () {
-        onButtonClicked();
-      },
-    ),
+    action: snackBarAction,
   );
-  ScaffoldMessenger.of(buildContext).showSnackBar(snackBar);
-}
-
-hideSnackBar({required BuildContext buildContext}) {
-  ScaffoldMessenger.of(buildContext).removeCurrentSnackBar();
 }
 
 Widget addMenuIconItem({required IconData iconData, required Function onTap}) {

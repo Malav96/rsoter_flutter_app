@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_demo_app/data/network/ApiManager.dart';
 import 'package:flutter_demo_app/data/network/CustomException.dart';
@@ -53,7 +51,6 @@ class StaffBloc extends Cubit<StaffUIStates> {
       }
     } catch (e) {
       emit(RefreshError(e.toString()));
-      emit(ApiHandling(ApiResponse.completed(_staffList)));
     }
   }
 
@@ -73,6 +70,5 @@ class StaffBloc extends Cubit<StaffUIStates> {
   Future<void> redirectToAddOrEditStaffScreen(
       Staff? staff, bool isAddStaff) async {
     emit(ShowAddOrEditStaff(staff, isAddStaff));
-    emit(ApiHandling(ApiResponse.completed(_staffList)));
   }
 }

@@ -12,12 +12,14 @@ import 'package:fluttertoast/fluttertoast.dart';
 class LoginScreen extends StatelessWidget {
   late BuildContext context;
   late LoginBloc _loginBloc;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
     this.context = context;
     SizeConfig().init(context);
     return Scaffold(
+        key: _scaffoldKey,
         backgroundColor: COLOR_TRANSPARENT,
         body: BlocProvider(
           create: (_) {
@@ -32,7 +34,6 @@ class LoginScreen extends StatelessWidget {
     return BlocListener<LoginBloc, LoginUIStates>(
         listener: (context, state) {
           FocusScope.of(context).unfocus();
-          hideSnackBar(buildContext: context);
           if (state is ShowValidationError) {
             Fluttertoast.showToast(msg: state.errorMessage);
           } else if (state is ShowForgotPassword) {
@@ -46,10 +47,11 @@ class LoginScreen extends StatelessWidget {
               if (state.response.status == Status.HIDE_LOADING) {
                 Navigator.pop(context);
               } else if (state.response.status == Status.ERROR) {
-                showSnackBar(
-                    buildContext: context,
+                _scaffoldKey.currentState?.showSnackBar(displaySnackBar(
                     message: state.response.message,
-                    onButtonClicked: () => _loginBloc.validateCredentials());
+                    snackBarAction: SnackBarAction(
+                        label: button_try_again,
+                        onPressed: () => _loginBloc.validateCredentials())));
               } else if (state.response.status == Status.COMPLETED) {
                 Navigator.pushReplacement(
                     context, SlideRightRoute(page: HomeScreen()));

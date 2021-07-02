@@ -11,12 +11,14 @@ import 'ForgotPasswordUIStates.dart';
 class ForgotPasswordPage extends StatelessWidget {
   final String email;
   late ForgotPasswordBloc _forgotPasswordBloc;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   ForgotPasswordPage({Key? key, required this.email}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        key: _scaffoldKey,
         backgroundColor: COLOR_TRANSPARENT,
         body: BlocProvider(
           create: (_) {
@@ -31,7 +33,6 @@ class ForgotPasswordPage extends StatelessWidget {
     return BlocListener<ForgotPasswordBloc, ForgotPasswordUIState>(
         listener: (context, state) {
           FocusScope.of(context).unfocus();
-          hideSnackBar(buildContext: context);
           if (state is ShowValidationError) {
             Fluttertoast.showToast(msg: state.errorMessage);
           } else if (state is ApiHandling) {
@@ -40,10 +41,12 @@ class ForgotPasswordPage extends StatelessWidget {
             } else if (state.response.status == Status.HIDE_LOADING) {
               Navigator.pop(context);
             } else if (state.response.status == Status.ERROR) {
-              showSnackBar(
-                  buildContext: context,
+              _scaffoldKey.currentState?.showSnackBar(displaySnackBar(
                   message: state.response.message,
-                  onButtonClicked: () => _forgotPasswordBloc.validateCredentials());
+                  snackBarAction: SnackBarAction(
+                      label: button_try_again,
+                      onPressed: () =>
+                          _forgotPasswordBloc.validateCredentials())));
             } else if (state.response.status == Status.COMPLETED) {
               showSuccessMessageAlertDialog(
                   buildContext: context,
@@ -56,54 +59,48 @@ class ForgotPasswordPage extends StatelessWidget {
   }
 
   Widget _forgotPasswordUI(BuildContext context, String email) {
-    var textTheme = Theme
-        .of(context)
-        .textTheme;
+    var textTheme = Theme.of(context).textTheme;
     return SafeArea(
         child: FullScreenBackground(
-          asstImage: BG_BACKGROUND,
-          childWidget: Center(
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset(IC_COMPANY_LOGO, scale: 3.0),
-                  SizedBox(height: 24),
-                  Text(label_forgot_your_password,
-                      textAlign: TextAlign.center, style: textTheme.headline5),
-                  SizedBox(height: 4),
-                  Container(
-                    width: SizeConfig.screenWidth * 0.8,
-                    child: Text(label_forgot_message,
-                        textAlign: TextAlign.center,
-                        style: textTheme.headline5
-                            ?.merge(TextStyle(fontWeight: FontWeight.bold))),
-                  ),
-                  SizedBox(height: 32),
-                  _emailTextInput(email),
-                  SizedBox(height: 16),
-                  _sendMeEmailButton(),
-                  SizedBox(height: 16),
-                  _backToLoginButton(context),
-                  SizedBox(height: 16),
-                  Text(label_company_rights,
-                      style: Theme
-                          .of(context)
-                          .textTheme
-                          .caption)
-                ],
+      asstImage: BG_BACKGROUND,
+      childWidget: Center(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(IC_COMPANY_LOGO, scale: 3.0),
+              SizedBox(height: 24),
+              Text(label_forgot_your_password,
+                  textAlign: TextAlign.center, style: textTheme.headline5),
+              SizedBox(height: 4),
+              Container(
+                width: SizeConfig.screenWidth * 0.8,
+                child: Text(label_forgot_message,
+                    textAlign: TextAlign.center,
+                    style: textTheme.headline5
+                        ?.merge(TextStyle(fontWeight: FontWeight.bold))),
               ),
-            ),
+              SizedBox(height: 32),
+              _emailTextInput(email),
+              SizedBox(height: 16),
+              _sendMeEmailButton(),
+              SizedBox(height: 16),
+              _backToLoginButton(context),
+              SizedBox(height: 16),
+              Text(label_company_rights,
+                  style: Theme.of(context).textTheme.caption)
+            ],
           ),
-        ));
+        ),
+      ),
+    ));
   }
 
   Widget _emailTextInput(String email) {
     return TextInputField(
         initialValue: email,
         hintText: hint_email_address,
-        onChanged: (value) =>
-            _forgotPasswordBloc.onEmailChange(value),
+        onChanged: (value) => _forgotPasswordBloc.onEmailChange(value),
         inputType: TextInputType.emailAddress,
         inputAction: TextInputAction.done);
   }
@@ -111,8 +108,7 @@ class ForgotPasswordPage extends StatelessWidget {
   Widget _sendMeEmailButton() {
     return NormalButton(
         buttonText: button_send_me_email,
-        onClicked: () =>
-            _forgotPasswordBloc.validateCredentials());
+        onClicked: () => _forgotPasswordBloc.validateCredentials());
   }
 
   Widget _backToLoginButton(BuildContext context) {

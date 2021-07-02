@@ -5,18 +5,16 @@ class StaffUIStates {}
 
 class RefreshError extends StaffUIStates {
   String errorMessage = '';
-  RefreshError(this.errorMessage);
+  RefreshError(this.errorMessage) : super();
 }
 
 class ShowAddOrEditStaff extends StaffUIStates {
   Staff? staff;
   bool isAddStaff = false;
-
   ShowAddOrEditStaff(this.staff, this.isAddStaff);
 }
 
 class ApiHandling extends StaffUIStates {
-  ApiResponse response;
-
+  final ApiResponse response;
   ApiHandling(this.response);
 }

@@ -15,6 +15,8 @@ import 'package:url_launcher/url_launcher.dart';
 class StaffScreen extends StatelessWidget {
   static late StaffBloc _staffBloc;
   late BuildContext _buildContext;
+  static final GlobalKey<ScaffoldState> _scaffoldKey =
+      GlobalKey<ScaffoldState>();
 
   static searchByStaffList(String value) {
     _staffBloc.searchByNameStaffList(value);
@@ -28,72 +30,74 @@ class StaffScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     this._buildContext = context;
     return Scaffold(
+        key: _scaffoldKey,
         backgroundColor: COLOR_VIEW_BACKGROUND,
         body: BlocProvider(
           create: (BuildContext context) {
             _staffBloc = StaffBloc();
             return _staffBloc;
           },
-          child: _blocListener(),
+          child: _blocConsumer(),
         ));
   }
 
-  Widget _blocListener() {
-    return BlocListener<StaffBloc, StaffUIStates>(
-        listener: (context, state) {
-          if (state is RefreshError) {
-            showSnackBar(
-                buildContext: context,
-                message: state.errorMessage,
-                onButtonClicked: () => _staffBloc.refreshStaffList(true));
-          } else if (state is ShowAddOrEditStaff) {
-            Navigator.push(
-                    context,
-                    SlideRightRoute(
-                        page: AddOrEditStaffScreen(
-                            staff: state.staff, isAddStaff: state.isAddStaff)))
-                .then((value) => updateList(value));
-          }
-        },
-        child: _staffUIView());
+  Widget _blocConsumer() {
+    return BlocConsumer<StaffBloc, StaffUIStates>(
+      buildWhen: (previousState, state) {
+        return state is ApiHandling;
+      },
+      builder: (BuildContext context, state) {
+        switch ((state as ApiHandling).response.status) {
+          case Status.COMPLETED:
+            return _staffListView((state.response.data as List<Staff>));
+          case Status.ERROR:
+            return ErrorView(
+                errorTitle: state.response.title,
+                errorMessage: state.response.message,
+                buttonText: button_try_again,
+                icon: Icons.cloud_off_rounded,
+                onClicked: () => _staffBloc.getStaffList());
+          case Status.EMPTY:
+            return ErrorView(
+                errorTitle: state.response.title,
+                errorMessage: state.response.message,
+                buttonText: button_refresh,
+                icon: Icons.tag_faces_sharp,
+                onClicked: () => _staffBloc.getStaffList());
+          case Status.OFFLINE:
+            return ErrorView(
+                errorTitle: state.response.title,
+                errorMessage: state.response.message,
+                buttonText: button_try_again,
+                icon: Icons.wifi_off_outlined,
+                onClicked: () => _staffBloc.getStaffList());
+          default:
+            return CircularProgressbar();
+        }
+      },
+      listener: (BuildContext context, state) {
+        if (state is RefreshError) {
+          _scaffoldKey.currentState?.showSnackBar(displaySnackBar(
+              message: state.errorMessage,
+              snackBarAction: SnackBarAction(
+                  label: button_try_again,
+                  onPressed: () => _staffBloc.refreshStaffList(true))));
+        } else if (state is ShowAddOrEditStaff) {
+          Navigator.push(
+                  context,
+                  SlideRightRoute(
+                      page: AddOrEditStaffScreen(
+                          staff: state.staff, isAddStaff: state.isAddStaff)))
+              .then((value) => updateList(value));
+        }
+      },
+    );
   }
 
   Future<void> updateList(bool? isRefreshList) async {
     if (isRefreshList == true) {
       _staffBloc.refreshStaffList(true);
     }
-  }
-
-  Widget _staffUIView() {
-    return BlocBuilder<StaffBloc, StaffUIStates>(builder: (context, state) {
-      switch ((state as ApiHandling).response.status) {
-        case Status.COMPLETED:
-          return _staffListView((state.response.data as List<Staff>));
-        case Status.ERROR:
-          return ErrorView(
-              errorTitle: state.response.title,
-              errorMessage: state.response.message,
-              buttonText: button_try_again,
-              icon: Icons.cloud_off_rounded,
-              onClicked: () => _staffBloc.getStaffList());
-        case Status.EMPTY:
-          return ErrorView(
-              errorTitle: state.response.title,
-              errorMessage: state.response.message,
-              buttonText: button_refresh,
-              icon: Icons.tag_faces_sharp,
-              onClicked: () => _staffBloc.getStaffList());
-        case Status.OFFLINE:
-          return ErrorView(
-              errorTitle: state.response.title,
-              errorMessage: state.response.message,
-              buttonText: button_try_again,
-              icon: Icons.wifi_off_outlined,
-              onClicked: () => _staffBloc.getStaffList());
-        default:
-          return CircularProgressbar();
-      }
-    });
   }
 
   Widget _staffListView(List<Staff> list) {

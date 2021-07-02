@@ -7,6 +7,11 @@ class ShowValidationError extends AddOrEditStaffUIStates {
   ShowValidationError(this.errorMessage);
 }
 
+class ShowCountryFlag extends AddOrEditStaffUIStates {
+  final String countryCode;
+  ShowCountryFlag(this.countryCode);
+}
+
 class ApiHandling extends AddOrEditStaffUIStates {
   ApiResponse response;
   ApiHandling(this.response);

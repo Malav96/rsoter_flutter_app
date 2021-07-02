@@ -16,6 +16,7 @@ import 'ExpiredTokenRetryPolicy.dart';
 class ApiHelper {
   static String _baseUrl = 'https://api.prod.rosterelf.com/2.0.0/';
   static Client client = InterceptedClient.build(
+      requestTimeout: Duration(seconds: 60),
       interceptors: [LoggingInterceptor()],
       retryPolicy: ExpiredTokenRetryPolicy());
 
@@ -25,8 +26,12 @@ class ApiHelper {
       final response =
           await client.get(Uri.parse(_baseUrl + endPoint), headers: {
         HttpHeaders.authorizationHeader: await Prefs.getToken,
-      });
+      }).timeout(Duration(seconds: 60));
       responseJson = _response(response);
+    } on TimeoutException {
+      throw InternalServerErrorExceptions(
+          title: error_message_no_internet_title,
+          message: error_message_no_internet_msg);
     } on SocketException {
       throw UnknownHostException(
           title: error_message_no_internet_title,
@@ -41,8 +46,12 @@ class ApiHelper {
       final response = await client
           .post(Uri.parse(_baseUrl + endPoint), body: body, headers: {
         HttpHeaders.authorizationHeader: await Prefs.getToken,
-      });
+      }).timeout(Duration(seconds: 60));
       responseJson = _response(response);
+    } on TimeoutException {
+      throw InternalServerErrorExceptions(
+          title: error_message_no_internet_title,
+          message: error_message_no_internet_msg);
     } on SocketException {
       throw UnknownHostException(
           title: error_message_no_internet_title,

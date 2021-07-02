@@ -22,22 +22,35 @@ class ApiManager {
     return await ApiHelper.get(LOGOUT);
   }
 
-  static Future<void> addOrEditStaff(bool isAddStaff, String firstName,
-      String lastName, String emailAddress, String mobileNumber) async {
-    var apiRequest = {
-      KEY_FIRST_NAME: firstName,
-      KEY_LAST_NAME: lastName,
-      KEY_EMAIL: emailAddress,
-      KEY_MOBILE_NUMBER: mobileNumber
-    };
-    if (isAddStaff)
+  static Future<void> addOrEditStaff(
+      String staffId,
+      bool isAddStaff,
+      String firstName,
+      String lastName,
+      String emailAddress,
+      String mobileNumber) async {
+    if (isAddStaff) {
+      var apiRequest = {
+        KEY_FIRST_NAME: firstName,
+        KEY_LAST_NAME: lastName,
+        KEY_EMAIL: emailAddress,
+        KEY_MOBILE_NUMBER: mobileNumber
+      };
       return await ApiHelper.post(ADD_STAFF, apiRequest);
-    else
+    } else {
+      var apiRequest = {
+        KEY_ID: staffId,
+        KEY_FIRST_NAME: firstName,
+        KEY_LAST_NAME: lastName,
+        KEY_EMAIL: emailAddress,
+        KEY_MOBILE_NUMBER: mobileNumber
+      };
       return await ApiHelper.post(UPDATE_STAFF, apiRequest);
+    }
   }
 
-  static Future<String> deleteStaff(String staffId) async {
-    var apiRequest = {KEY_ID: staffId};
-    return await ApiHelper.post(ADD_STAFF, apiRequest);
+  static Future<void> deleteStaff(int staffId) async {
+    var apiRequest = {KEY_ID: staffId.toString()};
+    return await ApiHelper.post(DELETE_STAFF, apiRequest);
   }
 }
