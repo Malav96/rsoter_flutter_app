@@ -1,24 +1,26 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_demo_app/data/preference/Prefs.dart';
 import 'package:flutter_demo_app/ui/dashboard/DashboardScreen.dart';
 import 'package:flutter_demo_app/ui/home/HomeBloc.dart';
+import 'package:flutter_demo_app/ui/login/LoginScreen.dart';
+import 'package:flutter_demo_app/ui/myinfo/MyInfoScreen.dart';
 import 'package:flutter_demo_app/ui/myshift/MyShiftScreen.dart';
 import 'package:flutter_demo_app/ui/roster/Roster.dart';
 import 'package:flutter_demo_app/ui/staff/StaffScreen.dart';
 import 'package:flutter_demo_app/utils/UtilsLibrary.dart';
 import 'package:flutter_demo_app/widget/WidgetLibrary.dart';
+import 'package:package_info/package_info.dart';
 
 import 'HomeUIStates.dart';
 
 class HomeScreen extends StatelessWidget {
-  late BuildContext _buildContext;
-  late HomeBloc _homeBloc;
+  static late BuildContext _buildContext;
+  static late HomeBloc _homeBloc;
 
   @override
   Widget build(BuildContext context) {
-    this._buildContext = context;
+    HomeScreen._buildContext = context;
     SizeConfig().init(context);
     return BlocProvider<HomeBloc>(
         create: (BuildContext context) {
@@ -26,70 +28,9 @@ class HomeScreen extends StatelessWidget {
           return _homeBloc;
         },
         child: Scaffold(
-          appBar: PreferredSize(
-              preferredSize: const Size(double.infinity, kToolbarHeight),
-              child: _appbar() // StreamBuilder
-              ),
           body: _body(),
           bottomNavigationBar: _bottomNavigationBar(),
         ));
-  }
-
-  Widget _appbar() {
-    return BlocBuilder<HomeBloc, HomeUIStates>(builder: (context, state) {
-      switch ((state as ShowSelectedBottomMenu).selectedIndex) {
-        case 1:
-          return _myShiftAppbar();
-        case 2:
-          return _staffAppbar();
-        case 3:
-          return _rosterAppbar();
-        default:
-          return _dashboardAppbar();
-      }
-    });
-  }
-
-  Widget _dashboardAppbar() {
-    return AppbarWithoutTab(
-      title: label_dashboard,
-      onTap: () {},
-      actions: [],
-    );
-  }
-
-  Widget _myShiftAppbar() {
-    return AppbarWithoutTab(
-      title: label_my_shift,
-      onTap: () {},
-      actions: [],
-    );
-  }
-
-  Widget _staffAppbar() {
-    return SearchView(
-        title: label_staff,
-        onTap: () {
-          log('Logout');
-        },
-        actions: [
-          addMenuIconItem(
-              iconData: Icons.add,
-              onTap: () => StaffScreen.onAddMenuButtonClick())
-        ],
-        onChanged: (String value) {
-          StaffScreen.searchByStaffList(value);
-        },
-        onCleared: () {
-          StaffScreen.searchByStaffList('');
-        },
-        onClosed: () {
-          StaffScreen.searchByStaffList('');
-        });
-  }
-
-  Widget _rosterAppbar() {
-    return AppbarWithoutTab(title: label_roster, onTap: () {}, actions: []);
   }
 
   Widget _body() {
@@ -130,5 +71,71 @@ class HomeScreen extends StatelessWidget {
         onTap: (index) => _homeBloc.onBottomMenuItemClick(index),
       );
     });
+  }
+
+  static void showSettingsDialog() {
+    PackageInfo.fromPlatform().then((PackageInfo packageInfo) {
+      showDialog(
+          context: _buildContext,
+          builder: (BuildContext context) {
+            return SettingsDialog(
+                appVersionInfo:
+                    '${packageInfo.version} (${packageInfo.buildNumber})',
+                dialogTitle: label_settings,
+                children: [
+                  SimpleDialogOption(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                          context, SlideRightRoute(page: MyInfoScreen()));
+                    },
+                    child: const Text(label_my_info),
+                  ),
+                  SimpleDialogOption(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      showLogoutAlertDialog();
+                    },
+                    child: const Text(label_logout),
+                  )
+                ]);
+          });
+    });
+  }
+
+  static void showLogoutAlertDialog() {
+    showDialog(
+      context: _buildContext,
+      barrierDismissible: false, // user must tap button for close dialog!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          insetPadding: EdgeInsets.zero,
+          contentPadding: EdgeInsets.fromLTRB(24, 16, 24, 0),
+          content: const Text(msg_logout),
+          actions: <Widget>[
+            TextButton(
+              child: const Text(button_cancel,
+                  style: TextStyle(color: COLOR_PRIMARY)),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            TextButton(
+              child: const Text(button_logout,
+                  style: TextStyle(color: COLOR_PRIMARY)),
+              onPressed: () {
+                Prefs.clear();
+                Navigator.pop(context);
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  SlideRightRoute(page: LoginScreen()),
+                  (route) => false,
+                );
+              },
+            )
+          ],
+        );
+      },
+    );
   }
 }

@@ -80,7 +80,9 @@ class AddOrEditStaffBloc extends Cubit<AddOrEditStaffUIStates> {
       emit(ShowValidationError(error_message_enter_valid_mobile));
     } else {
       if (_mobileNumber.isNotEmpty) {
-        _mobileNumber = '${_countryCode?.dialCode}${_mobileNumber}';
+        if (!_mobileNumber.contains(_countryCode?.dialCode ?? '+61')) {
+          _mobileNumber = '${_countryCode?.dialCode}${_mobileNumber}';
+        }
       }
       try {
         emit(ApiHandling(ApiResponse.loading()));

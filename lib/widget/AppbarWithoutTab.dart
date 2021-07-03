@@ -3,7 +3,7 @@ import 'package:flutter_demo_app/utils/UtilsLibrary.dart';
 
 class AppbarWithoutTab extends StatelessWidget {
   final String title;
-  final GestureTapCallback? onTap;
+  final VoidCallback onTap;
   final List<Widget>? actions;
 
   const AppbarWithoutTab(
@@ -17,7 +17,9 @@ class AppbarWithoutTab extends StatelessWidget {
         title: Text(title),
         centerTitle: true,
         leading: GestureDetector(
-            onTap: () => onTap,
+            onTap: () {
+              return onTap();
+            },
             child: Image.asset(
               IC_TOOLBAR_LOGO,
               scale: 3.0,

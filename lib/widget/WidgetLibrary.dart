@@ -10,3 +10,4 @@ export 'CircularProgressbar.dart';
 export 'ErrorState.dart';
 export 'SearchView.dart';
 export 'CustomAlertDialog.dart';
+export 'SettingsDialog.dart';

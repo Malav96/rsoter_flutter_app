@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_demo_app/data/network/Response.dart';
 import 'package:flutter_demo_app/models/index.dart';
+import 'package:flutter_demo_app/ui/home/HomeScreen.dart';
 import 'package:flutter_demo_app/ui/staff/StaffBloc.dart';
 import 'package:flutter_demo_app/ui/staff/StaffUIStates.dart';
 import 'package:flutter_demo_app/ui/staff/addoredit/AddOrEditStaffScreen.dart';
@@ -18,18 +19,14 @@ class StaffScreen extends StatelessWidget {
   static final GlobalKey<ScaffoldState> _scaffoldKey =
       GlobalKey<ScaffoldState>();
 
-  static searchByStaffList(String value) {
-    _staffBloc.searchByNameStaffList(value);
-  }
-
-  static onAddMenuButtonClick() {
-    _staffBloc.redirectToAddOrEditStaffScreen(null, true);
-  }
-
   @override
   Widget build(BuildContext context) {
     this._buildContext = context;
     return Scaffold(
+        appBar: PreferredSize(
+            preferredSize: const Size(double.infinity, kToolbarHeight),
+            child: _appbar() // StreamBuilder
+            ),
         key: _scaffoldKey,
         backgroundColor: COLOR_VIEW_BACKGROUND,
         body: BlocProvider(
@@ -39,6 +36,27 @@ class StaffScreen extends StatelessWidget {
           },
           child: _blocConsumer(),
         ));
+  }
+
+  Widget _appbar() {
+    return SearchView(
+        title: label_staff,
+        onTap: () => HomeScreen.showSettingsDialog(),
+        actions: [
+          addMenuIconItem(
+              iconData: Icons.add,
+              onTap: () =>
+                  _staffBloc.redirectToAddOrEditStaffScreen(null, true))
+        ],
+        onChanged: (String value) {
+          _staffBloc.searchByNameStaffList(value);
+        },
+        onCleared: () {
+          _staffBloc.searchByNameStaffList('');
+        },
+        onClosed: () {
+          _staffBloc.searchByNameStaffList('');
+        });
   }
 
   Widget _blocConsumer() {
@@ -136,7 +154,7 @@ class StaffScreen extends StatelessWidget {
     return CircleAvatar(
       radius: 20.0,
       backgroundImage: NetworkImage(avatar),
-      backgroundColor: Colors.transparent,
+      backgroundColor: COLOR_VIEW_BACKGROUND,
     );
   }
 

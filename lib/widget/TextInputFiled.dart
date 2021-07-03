@@ -7,6 +7,7 @@ class TextInputField extends StatelessWidget {
   final TextInputType inputType;
   final TextInputAction inputAction;
   final bool obscureText;
+  final TextAlign textAlign;
   final Color textInputBackgroundColor;
   final String? initialValue;
   final VoidCallback? onClicked;
@@ -18,6 +19,7 @@ class TextInputField extends StatelessWidget {
       required this.inputType,
       required this.inputAction,
       this.obscureText = false,
+      this.textAlign = TextAlign.start,
       this.textInputBackgroundColor = COLOR_WHITE,
       this.initialValue,
       this.onClicked})
@@ -31,21 +33,24 @@ class TextInputField extends StatelessWidget {
       decoration: BoxDecoration(
           color: textInputBackgroundColor,
           border: Border.all(color: COLOR_GREY, width: 0.5)),
-      child: TextFormField(
-          onTap: () {
-            onClicked!();
-          },
-          onChanged: onChanged,
-          initialValue: initialValue,
-          cursorColor: COLOR_PRIMARY,
-          textAlign: TextAlign.center,
-          decoration: InputDecoration(
-            hintText: hintText,
-            border: InputBorder.none,
-          ),
-          keyboardType: inputType,
-          textInputAction: inputAction,
-          obscureText: obscureText),
+      child: Padding(
+        padding: const EdgeInsets.only(left: 16, right: 16),
+        child: TextFormField(
+            onTap: () {
+              onClicked!();
+            },
+            onChanged: onChanged,
+            initialValue: initialValue,
+            cursorColor: COLOR_PRIMARY,
+            textAlign: textAlign,
+            decoration: InputDecoration(
+              hintText: hintText,
+              border: InputBorder.none,
+            ),
+            keyboardType: inputType,
+            textInputAction: inputAction,
+            obscureText: obscureText),
+      ),
     );
   }
 }

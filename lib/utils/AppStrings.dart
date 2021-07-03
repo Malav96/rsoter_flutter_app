@@ -12,6 +12,8 @@ const button_refresh = 'Refresh';
 const button_save = 'Save';
 const button_delete = 'DELETE';
 const button_cancel = 'Cancel';
+const button_update = 'Update';
+const button_logout = 'Logout';
 
 /*All error*/
 const error_email = 'Please enter a valid email address';
@@ -68,21 +70,29 @@ const label_future = 'FUTURE';
 const label_add_staff = 'Add Staff';
 const label_edit_staff = 'Edit Staff';
 const label_delete_staff = 'Delete Staff?';
+const label_settings = 'Settings';
+const label_my_info = 'My Info';
+const label_change_password = 'Change Password';
+const label_edit_profile = 'Edit Profile';
+const label_logout = 'Logout';
+const label_request_leave = 'Request Leave';
+const label_add_availability = 'Add Availability';
 
 /*All hint*/
 const hint_email_address = 'Email Address';
 const hint_password = 'Password';
 const hint_search = 'Search';
 const hint_search_by_name = 'Search by name';
-const hint_first_name = 'First Name*';
-const hint_last_name = 'Last Name*';
-const hint_star_email_address = 'Email Address*';
-const hint_mobile_number = 'Mobile Number*';
+const hint_first_name = 'First Name *';
+const hint_last_name = 'Last Name *';
+const hint_star_email_address = 'Email Address *';
+const hint_mobile_number = 'Mobile Number';
 
 /*All message*/
 const msg_please_wait_moment = 'Please wait a moment...';
 const msg_delete_employee =
     'Are you sure you want to delete this staff?\n\nDoing so will make their account inactive and they will not longer be able to login.';
+const msg_logout = 'Are you sure you want to logout?';
 
 const List<BottomNavigationBarItem> bottomNavigationBarItem = [
   BottomNavigationBarItem(

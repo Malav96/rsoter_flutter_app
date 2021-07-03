@@ -5,9 +5,13 @@ class TabView extends StatelessWidget {
   final List<Widget> tabs;
   final Widget? body;
   final bool isScrollable;
+  final ValueChanged<int> onTap;
 
   const TabView(
-      {required this.tabs, required this.body, this.isScrollable = false});
+      {required this.tabs,
+      required this.body,
+      this.isScrollable = false,
+      required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +22,9 @@ class TabView extends StatelessWidget {
           appBar: AppBar(
               toolbarHeight: kMinInteractiveDimension,
               bottom: TabBar(
+                onTap: (index) {
+                  onTap(index);
+                },
                 indicatorColor: COLOR_WHITE,
                 isScrollable: isScrollable,
                 tabs: tabs,

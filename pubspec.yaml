@@ -39,6 +39,7 @@ dependencies:
   flutter_search_bar: ^2.1.0
   country_code_picker: ^2.0.2
   phone_number: ^0.11.0+1
+  package_info: ^2.0.2
 
 dev_dependencies:
   flutter_test:

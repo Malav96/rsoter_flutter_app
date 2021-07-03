@@ -100,7 +100,8 @@ class LoginScreen extends StatelessWidget {
         hintText: hint_email_address,
         onChanged: (value) => _loginBloc.onEmailChange(value),
         inputType: TextInputType.emailAddress,
-        inputAction: TextInputAction.next);
+        inputAction: TextInputAction.next,
+        textAlign: TextAlign.center);
   }
 
   Widget _passwordTextInput() {
@@ -110,6 +111,7 @@ class LoginScreen extends StatelessWidget {
       inputType: TextInputType.visiblePassword,
       inputAction: TextInputAction.done,
       obscureText: true,
+      textAlign: TextAlign.center,
     );
   }
 

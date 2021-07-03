@@ -102,7 +102,8 @@ class ForgotPasswordPage extends StatelessWidget {
         hintText: hint_email_address,
         onChanged: (value) => _forgotPasswordBloc.onEmailChange(value),
         inputType: TextInputType.emailAddress,
-        inputAction: TextInputAction.done);
+        inputAction: TextInputAction.done,
+        textAlign: TextAlign.center);
   }
 
   Widget _sendMeEmailButton() {
