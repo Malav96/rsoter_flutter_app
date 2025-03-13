@@ -2,6 +2,11 @@
 
 RosterElf was created by business owners for business owners to take the hassle out of rostering and managing staff. Our foundation is a magically simple, cloud-based software which makes the setup and ongoing scheduling of your employees easy and intuitive.
 
+![image](https://github.com/Malav96/rsoter_flutter_app/blob/develop/unnamed%20(1).jpg)
+![image](https://github.com/Malav96/rsoter_flutter_app/blob/develop/unnamed%20(3).jpg)
+![image](https://github.com/Malav96/rsoter_flutter_app/blob/develop/unnamed%20(2).jpg)
+![image](https://github.com/Malav96/rsoter_flutter_app/blob/develop/unnamed%20(1).jpg)
+
 ## Feature's
 
 - Mobile Rostering Made Easy With Staff Rostering App : RosterElf staff scheduling app allows managers to create, update, and re-publish rosters from the convenience of their smartphones
